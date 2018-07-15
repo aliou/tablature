@@ -25,4 +25,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler', '~> 1.16'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
+  spec.add_development_dependency 'rspec-instafail'
+  spec.add_development_dependency 'pg', '~> 0.19'
+
+  spec.add_dependency 'activerecord', '>= 5.0.0'
+  spec.add_dependency 'railties', '>= 5.0.0'
 end
