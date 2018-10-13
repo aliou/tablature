@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'Rails + Postgres Partitions'
   spec.description   = 'Rails + Postgres Partitions'
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.homepage      = "https://aliou.me"
   spec.license       = 'MIT'
 
   spec.metadata['allowed_push_host'] = '' if spec.respond_to?(:metadata)
