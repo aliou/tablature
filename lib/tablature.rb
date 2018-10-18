@@ -1,5 +1,6 @@
 require 'tablature/adapters/postgres'
 require 'tablature/configuration'
+require 'tablature/railtie'
 require 'tablature/version'
 
 require 'active_record'
