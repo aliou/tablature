@@ -1,3 +1,5 @@
+require 'database_cleaner'
+
 require 'bundler/setup'
 require 'tablature'
 
@@ -12,6 +14,14 @@ RSpec.configure do |config|
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
+  end
+
+  DatabaseCleaner.strategy = :transaction
+
+  config.around(:each, database: true) do |example|
+    DatabaseCleaner.start
+    example.run
+    DatabaseCleaner.clean
   end
 
   config.include ActiveSupport::Testing::Stream if defined? ActiveSupport::Testing::Stream
