@@ -19,6 +19,10 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
+  if ENV['CI'].blank?
+    config.filter_run_when_matching focus: true
+  end
+
   DatabaseCleaner.strategy = :transaction
 
   config.around(:each, database: true) do |example|
