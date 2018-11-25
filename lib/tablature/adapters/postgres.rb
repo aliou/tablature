@@ -1,6 +1,8 @@
 require_relative 'postgres/connection'
 require_relative 'postgres/errors'
 require_relative 'postgres/partitioned_tables'
+require_relative 'postgres/quoting'
+require_relative 'postgres/uuid'
 
 module Tablature
   # Tablature database adapters.
@@ -18,6 +20,9 @@ module Tablature
     # The methods are documented here for insight into specifics of how Tablature
     # integrates with Postgres and the responsibilities of {Adapters}.
     class Postgres
+      include Quoting
+      include UUID
+
       # Creates an instance of the Tablature Postgres adapter.
       #
       # This is the default adapter for Tablature. Configuring it via
