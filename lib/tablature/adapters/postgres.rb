@@ -40,34 +40,38 @@ module Tablature
         @connectable = connectable
       end
 
-      # TODO: Check version of postgres.
-      def create_list_partition(table_name, partition_key:, **options)
+      def create_list_partition(table_name, options, &block)
         raise_unless_list_partition_supported
 
         # Postgres 10 does not handle indexes and therefore primary keys.
         # Therefore we manually create an `id` column.
         # TODO: Either make the library Postgres 11 only, or two code paths between Postgres 10 and
         # Postgres 11.
-        modified_options = options.except(:id, :primary_key)
-        id               = options.fetch(:id, :bigserial)
-        primary_key      = options.fetch(:primary_key, :id)
-
-        raise ArgumentError, 'composite primary key not supported' if primary_key.is_a?(Array)
+        modified_options = options.except(:id, :primary_key, :partition_key)
+        id_options = extract_primary_key!(options.slice(:id, :primary_key))
+        partition_key = options.fetch(:partition_key)
 
         modified_options[:id]      = false
         modified_options[:options] = "PARTITION BY LIST (#{quote_partition_key(partition_key)})"
 
-        result = create_table(table_name, modified_options) do |td|
-          if id == :uuid
-            td.column(primary_key, id, null: false, default: uuid_function)
-          elsif id
-            td.column(primary_key, id, null: false)
-          end
+        create_partition(table_name, id_options, modified_options, &block)
+      end
 
-          yield(td) if block_given?
-        end
+      def create_range_partition(table_name, options, &block)
+        raise_unless_range_partition_supported
 
-        result
+        # Postgres 10 does not handle indexes and therefore primary keys.
+        # Therefore we manually create an `id` column.
+        # TODO: Either make the library Postgres 11 only, or two code paths between Postgres 10 and
+        # Postgres 11.
+        modified_options = options.except(:id, :primary_key, :partition_key)
+        id_options = extract_primary_key!(options.slice(:id, :primary_key))
+        partition_key = options.fetch(:partition_key)
+
+        modified_options[:id]      = false
+        modified_options[:options] = "PARTITION BY RANGE (#{quote_partition_key(partition_key)})"
+
+        create_partition(table_name, id_options, modified_options, &block)
       end
 
       def partitioned_tables
@@ -84,16 +88,36 @@ module Tablature
         Connection.new(connectable.connection)
       end
 
+      def create_partition(table_name, id_options, table_options, &block)
+        create_table(table_name, table_options) do |td|
+          # TODO: Handle the id things here (depending on the postgres version)
+          if id_options[:type] == :uuid
+            td.column(
+              id_options[:column_name], id_options[:type], null: false, default: uuid_function
+            )
+          elsif id_options[:type]
+            td.column(id_options[:column_name], id_options[:type], null: false)
+          end
+
+          yield(td) if block.present?
+        end
+      end
+
       def raise_unless_list_partition_supported
         raise ListPartitionsNotSupportedError unless connection.supports_list_partitions?
       end
 
-      def quote_partition_key(key)
-        key.to_s.split('::').map(&method(:quote_column_name)).join('::')
+      def raise_unless_range_partition_supported
+        raise RangePartitionsNotSupportedError unless connection.supports_range_partitions?
       end
 
-      def uuid_function
-        try(:supports_pgcrypto_uuid?) ? 'gen_random_uuid()' : 'uuid_generate_v4()'
+      def extract_primary_key!(options)
+        type = options.fetch(:id, :bigserial)
+        column_name = options.fetch(:primary_key, :id)
+
+        raise ArgumentError, 'composite primary key not supported' if column_name.is_a?(Array)
+
+        { type: type, column_name: column_name }
       end
     end
   end
