@@ -28,7 +28,6 @@ module Tablature
         #
         # @return [Boolean]
         def supports_hash_partitions?
-          # TODO: Check that this is the correct value.
           postgresql_version >= 110_000
         end
 
