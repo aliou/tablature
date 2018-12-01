@@ -56,4 +56,16 @@ RSpec.describe Tablature::Adapters::Postgres, :database do
       expect(adapter.partitioned_tables.map(&:name)).to include('events')
     end
   end
+
+  describe '#create_range_partition_of' do
+    it 'raises if the range bounds are missing' do
+      adapter = described_class.new
+      adapter.create_range_partition 'events', partition_key: 'event_id' do |t|
+        t.integer :event_id, null: false
+      end
+
+      expect { adapter.create_range_partition_of('events', range_start: nil) }
+        .to raise_error described_class::MissingRangePartitionBoundsError
+    end
+  end
 end

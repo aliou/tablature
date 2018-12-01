@@ -28,13 +28,38 @@ module Tablature
             create_partition(table_name, id_options, modified_options, &block)
           end
 
+          def create_range_partition_of(parent_table, options)
+            range_start = options.fetch(:range_start, nil)
+            range_end = options.fetch(:range_end, nil)
+
+            raise MissingRangePartitionBoundsError if range_start.nil? || range_end.nil?
+
+            name = options.fetch(:name, partition_name(parent_table, range_start, range_end))
+            # TODO: Call `create_table` here instead of running the query.
+            # TODO: Pass the options to `create_table` to allow further configuration of the table,
+            # e.g. sub-partitioning the table.
+            query = <<~SQL.strip
+              CREATE TABLE #{quote_table_name(name)} PARTITION OF #{quote_table_name(parent_table)}
+              FOR VALUES FROM (#{quote(range_start)}) TO (#{quote(range_end)});
+            SQL
+
+            execute(query)
+          end
+
           private
 
           attr_reader :connection
-          delegate :execute, :quote_column_name, :create_table, to: :connection
+
+          delegate :execute, :quote, :quote_column_name, :quote_table_name, :create_table,
+                   to: :connection
 
           def raise_unless_range_partition_supported
             raise RangePartitionsNotSupportedError unless connection.supports_range_partitions?
+          end
+
+          def partition_name(parent_table, range_start, range_end)
+            key = [range_start, range_end].join(', ')
+            "#{parent_table}_#{Digest::MD5.hexdigest(key)[0..6]}"
           end
         end
       end

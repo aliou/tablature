@@ -26,6 +26,12 @@ module Tablature
           super('Range partitions require Postgres 10 or newer')
         end
       end
+
+      class MissingRangePartitionBoundsError < StandardError
+        def initialize
+          super('Missing bounds for of range partition')
+        end
+      end
     end
   end
 end
