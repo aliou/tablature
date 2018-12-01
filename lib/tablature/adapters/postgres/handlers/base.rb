@@ -5,8 +5,6 @@ module Tablature
   module Adapters
     class Postgres
       module Handlers
-        # TODO: Inherit a base handler that defines the shared methods.
-        # TODO: Documentation.
         class Base
           include Postgres::Quoting
           include Postgres::UUID
