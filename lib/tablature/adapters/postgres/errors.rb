@@ -11,6 +11,12 @@ module Tablature
         end
       end
 
+      class MissingListPartitionValuesError < StandardError
+        def initialize
+          super('Missing values for of list partition')
+        end
+      end
+
       # Raised when a range partition operation is attempted on a database
       # version that does not support range partitions.
       #

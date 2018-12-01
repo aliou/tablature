@@ -27,13 +27,37 @@ module Tablature
             create_partition(table_name, id_options, modified_options, &block)
           end
 
+          def create_list_partition_of(parent_table, options)
+            values = options.fetch(:values, [])
+            raise MissingListPartitionValuesError if values.blank?
+
+            name = options.fetch(:name, partition_name(parent_table, values))
+            # TODO: Call `create_table` here instead of running the query.
+            # TODO: Pass the options to `create_table` to allow further configuration of the table,
+            # e.g. sub-partitioning the table.
+            query = <<~SQL.strip
+              CREATE TABLE #{quote_table_name(name)} PARTITION OF #{quote_table_name(parent_table)}
+              FOR VALUES IN (#{quote_collection(values)})
+            SQL
+
+            execute(query)
+          end
+
           private
 
           attr_reader :connection
-          delegate :execute, :quote_column_name, :create_table, to: :connection
+
+          delegate :execute, :quote, :quote_column_name, :quote_table_name, :create_table,
+                   to: :connection
 
           def raise_unless_list_partition_supported
             raise ListPartitionsNotSupportedError unless connection.supports_list_partitions?
+          end
+
+          # TODO: Better ?
+          def partition_name(parent_table, values)
+            key = values.inspect
+            "#{parent_table}_#{Digest::MD5.hexdigest(key)[0..6]}"
           end
         end
       end

@@ -11,6 +11,12 @@ module Tablature
       Tablature.database.create_list_partition(name, options, &block)
     end
 
+    def create_list_partition_of(parent_table, options)
+      raise ArgumentError, 'values must be defined' if options[:values].nil?
+
+      Tablature.database.create_list_partition_of(parent_table, options)
+    end
+
     def create_range_partition(name, options, &block)
       raise ArgumentError, 'partition_key must be defined' if options[:partition_key].nil?
 
