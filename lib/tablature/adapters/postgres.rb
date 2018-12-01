@@ -1,3 +1,5 @@
+require 'active_support/core_ext/module/delegation'
+
 require_relative 'postgres/connection'
 require_relative 'postgres/errors'
 require_relative 'postgres/handlers/list'
