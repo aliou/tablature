@@ -15,13 +15,19 @@ module Tablature
     # @return [Symbol]
     attr_reader :type
 
-    # Returns a new instance of View.
+    # The partitions of the table.
+    # @return [Array]
+    attr_reader :partitions
+
+    # Returns a new instance of PartitionTable.
     #
     # @param name [String] The name of the view.
     # @param type [:symbol] One of :range, :list or :hash
-    def initialize(name:, type:)
+    # @param partitions [Array] The partitions of the table.
+    def initialize(name:, type:, partitions: [])
       @name = name
       @type = type
+      @partitions = partitions
     end
 
     # @api private

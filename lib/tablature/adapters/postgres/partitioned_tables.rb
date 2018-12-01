@@ -9,22 +9,24 @@ module Tablature
         end
 
         def all
-          partitioned_tables_from_postgres.map(&method(:to_tablature_table))
+          partitions.group_by { |row| row['table_name'] }.map(&method(:to_tablature_table))
         end
 
         private
 
         attr_reader :connection
 
-        def partitioned_tables_from_postgres
+        def partitions
           connection.execute(<<-SQL)
             SELECT
               c.oid,
               c.relname AS table_name,
-              p.partstrat AS type
+              p.partstrat AS type,
+              (i.inhrelid::REGCLASS)::TEXT AS partition_name
             FROM pg_class c
               INNER JOIN pg_partitioned_table p ON c.oid = p.partrelid
               LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
+              FULL OUTER JOIN pg_catalog.pg_inherits i ON c.oid = i.inhparent
             WHERE
               p.partstrat IN ('l', 'r', 'h')
               AND c.relname NOT IN (SELECT extname FROM pg_extension)
@@ -40,10 +42,12 @@ module Tablature
         }.freeze
         private_constant :TYPE_MAP
 
-        def to_tablature_table(result)
-          name = result['table_name']
+        def to_tablature_table(table_name, rows)
+          result = rows.first
           type = TYPE_MAP.fetch(result['type'])
-          Tablature::PartitionedTable.new(name: name, type: type)
+          partitions = rows.map { |row| row['partition_name'] }.compact
+
+          Tablature::PartitionedTable.new(name: table_name, type: type, partitions: partitions)
         end
       end
     end
