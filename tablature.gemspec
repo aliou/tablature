@@ -13,8 +13,6 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://aliou.me"
   spec.license       = 'MIT'
 
-  spec.metadata['allowed_push_host'] = '' if spec.respond_to?(:metadata)
-
   spec.files = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
   end
