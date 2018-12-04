@@ -13,6 +13,9 @@ require 'active_record'
 # Tablature adds methods to `ActiveRecord::Migration` to create and manage partitioned
 # tables in Rails applications.
 module Tablature
+  # Hooks Tablature into Rails.
+  #
+  # Enables tablature migration methods.
   def self.load
     ActiveRecord::ConnectionAdapters::AbstractAdapter.include Tablature::Statements
     ActiveRecord::Migration::CommandRecorder.include Tablature::CommandRecorder
@@ -20,6 +23,9 @@ module Tablature
     ActiveRecord::Base.prepend Tablature::Model
   end
 
+  # The current database adapter used by Tablature.
+  #
+  # This defaults to {Adapters::Postgres} by can be overriden via {Configuration}.
   def self.database
     configuration.database
   end

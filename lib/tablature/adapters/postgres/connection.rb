@@ -33,7 +33,7 @@ module Tablature
 
         # An integer representing the version of Postgres we're connected to.
         #
-        # postgresql_version is public in Rails 5, but protected in earlier
+        # +postgresql_version+ is public in Rails 5, but protected in earlier
         # versions.
         #
         # @return [Integer]

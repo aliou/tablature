@@ -4,7 +4,7 @@ module Tablature
   module Adapters
     class Postgres
       module Handlers
-        # TODO: Documentation.
+        # @api private
         class Range < Base
           def initialize(connection)
             @connection = connection

@@ -4,7 +4,9 @@ require 'tablature/adapters/postgres/uuid'
 module Tablature
   module Adapters
     class Postgres
+      # @api private
       module Handlers
+        # @api private
         class Base
           include Postgres::Quoting
           include Postgres::UUID

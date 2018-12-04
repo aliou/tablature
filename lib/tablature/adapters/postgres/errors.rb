@@ -11,6 +11,8 @@ module Tablature
         end
       end
 
+      # Raised when trying to create a list partition without specifying the values of the partition
+      # key.
       class MissingListPartitionValuesError < StandardError
         def initialize
           super('Missing values for of list partition')
@@ -27,6 +29,8 @@ module Tablature
         end
       end
 
+      # Raised when trying to create a range partition without specifying the range of the partition
+      # key.
       class MissingRangePartitionBoundsError < StandardError
         def initialize
           super('Missing bounds for of range partition')

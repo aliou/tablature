@@ -8,6 +8,9 @@ module Tablature
           @connection = connection
         end
 
+        # All of the partitioned table that this connection has defined.
+        #
+        # @return [Array<Tablature::PartitionedTable>]
         def all
           partitions.group_by { |row| row['table_name'] }.map(&method(:to_tablature_table))
         end
