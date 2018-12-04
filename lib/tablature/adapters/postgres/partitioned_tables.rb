@@ -38,19 +38,21 @@ module Tablature
           SQL
         end
 
-        TYPE_MAP = {
+        METHOD_MAP = {
           'l' => :list,
           'r' => :range,
           'h' => :hash
         }.freeze
-        private_constant :TYPE_MAP
+        private_constant :METHOD_MAP
 
         def to_tablature_table(table_name, rows)
           result = rows.first
-          type = TYPE_MAP.fetch(result['type'])
+          partioning_method = METHOD_MAP.fetch(result['type'])
           partitions = rows.map { |row| row['partition_name'] }.compact
 
-          Tablature::PartitionedTable.new(name: table_name, type: type, partitions: partitions)
+          Tablature::PartitionedTable.new(
+            name: table_name, partioning_method: partioning_method, partitions: partitions
+          )
         end
       end
     end

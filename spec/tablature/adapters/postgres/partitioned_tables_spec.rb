@@ -13,7 +13,7 @@ RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
 
     expect(tables.size).to eq(1)
     expect(first.name).to eq('events')
-    expect(first.type).to eq(:list)
+    expect(first.partioning_method).to eq(:list)
     expect(first.partitions).to include('events_10')
   end
 
@@ -29,7 +29,7 @@ RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
 
     expect(tables.size).to eq(1)
     expect(first.name).to eq('events')
-    expect(first.type).to eq(:range)
+    expect(first.partioning_method).to eq(:range)
     expect(first.partitions).to include('events_10')
   end
 
@@ -47,7 +47,7 @@ RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
 
     expect(tables.size).to eq(1)
     expect(first.name).to eq('events')
-    expect(first.type).to eq(:hash)
+    expect(first.partioning_method).to eq(:hash)
     expect(first.partitions).to match_array(['events_0', 'events_1', 'events_2'])
   end
 end
