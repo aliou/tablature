@@ -1,7 +1,7 @@
 ENV['RAILS_ENV'] = 'test'
 require 'database_cleaner'
 
-require File.expand_path("../dummy/config/environment", __FILE__)
+require File.expand_path('dummy/config/environment', __dir__)
 
 require 'bundler/setup'
 require 'tablature'
@@ -19,9 +19,7 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  if ENV['CI'].blank?
-    config.filter_run_when_matching focus: true
-  end
+  config.filter_run_when_matching focus: true if ENV['CI'].blank?
 
   DatabaseCleaner.strategy = :transaction
 
