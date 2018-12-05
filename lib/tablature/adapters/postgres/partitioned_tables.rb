@@ -48,11 +48,18 @@ module Tablature
         def to_tablature_table(table_name, rows)
           result = rows.first
           partioning_method = METHOD_MAP.fetch(result['type'])
-          partitions = rows.map { |row| row['partition_name'] }.compact
+          partitions = rows.map { |row| row['partition_name'] }.compact.map(&method(:unquote))
 
           Tablature::PartitionedTable.new(
             name: table_name, partioning_method: partioning_method, partitions: partitions
           )
+        end
+
+        # Taken from Rails's codebase.
+        def unquote(part)
+          return part if part.blank?
+
+          part.start_with?('"') ? part[1..-2] : part
         end
       end
     end
