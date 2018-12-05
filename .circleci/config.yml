@@ -1,0 +1,81 @@
+# TODO: Simplify this
+version: 2
+jobs:
+  postgres_10:
+    working_directory: ~/tablature-rb
+    docker:
+      - image: circleci/ruby:2.4
+        environment:
+          DATABASE_URL: "postgres://postgres@localhost:5432/dummy_test"
+      - image: circleci/postgres:10-alpine
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: dummy_test
+          POSTGRES_PASSWORD: ""
+    steps:
+      - checkout
+
+      - type: cache-restore
+        name: Restore bundle cache
+        key: tablature-{{ checksum "tablature.gemspec" }}-{{ checksum "Gemfile" }}
+
+      - run:
+          name: Install dependencies
+          command: bundle install --path vendor/bundle
+
+      - type: cache-save
+        name: Store bundle cache
+        key: tablature-{{ checksum "tablature.gemspec" }}-{{ checksum "Gemfile" }}
+        paths:
+          - vendor/bundle
+
+      - run:
+          name: Wait for Postgres
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+
+      - run:
+          name: Run tests
+          command: bundle exec rspec --tag ~postgres_11
+
+  postgres_11:
+    working_directory: ~/tablature-rb
+    docker:
+      - image: circleci/ruby:2.4
+        environment:
+          DATABASE_URL: "postgres://postgres@localhost:5432/dummy_test"
+      - image: circleci/postgres:11-alpine
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: dummy_test
+          POSTGRES_PASSWORD: ""
+    steps:
+      - checkout
+
+      - type: cache-restore
+        name: Restore bundle cache
+        key: tablature-{{ checksum "tablature.gemspec" }}-{{ checksum "Gemfile" }}
+
+      - run:
+          name: Install dependencies
+          command: bundle install --path vendor/bundle
+
+      - type: cache-save
+        name: Store bundle cache
+        key: tablature-{{ checksum "tablature.gemspec" }}-{{ checksum "Gemfile" }}
+        paths:
+          - vendor/bundle
+
+      - run:
+          name: Wait for Postgres
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+
+      - run:
+          name: Run tests
+          command: bundle exec rspec
+
+workflows:
+  version: 2
+  tablature:
+    jobs:
+      - postgres_10
+      - postgres_11

@@ -26,11 +26,10 @@ module Tablature
   # Modify Tablature's current configuration
   #
   # @yieldparam [Tablature::Configuration] config current Tablature config
-  # ```
-  # Tablature.configure do |config|
-  #   config.database = Tablature::Adapters::Postgres.new
-  # end
-  # ```
+  # @example
+  #   Tablature.configure do |config|
+  #     config.database = Tablature::Adapters::Postgres.new
+  #   end
   def self.configure
     yield configuration
   end

@@ -1,1 +1,3 @@
 gemspec
+
+gem 'pry'

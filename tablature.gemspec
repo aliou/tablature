@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'Rails + Postgres Partitions'
   spec.description   = 'Rails + Postgres Partitions'
-  spec.homepage      = "https://aliou.me"
+  spec.homepage      = 'https://aliou.me'
   spec.license       = 'MIT'
 
   spec.files = `git ls-files -z`.split("\x0").reject do |f|
@@ -21,10 +21,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_development_dependency 'bundler', '~> 1.16'
+  spec.add_development_dependency 'database_cleaner'
+  spec.add_development_dependency 'pg', '~> 0.19'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'rspec-instafail'
-  spec.add_development_dependency 'pg', '~> 0.19'
 
   spec.add_dependency 'activerecord', '>= 5.0.0'
   spec.add_dependency 'railties', '>= 5.0.0'
