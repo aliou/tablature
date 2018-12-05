@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    tablature (0.1.0)
+    tablature (0.1.1)
       activerecord (>= 5.0.0)
       railties (>= 5.0.0)
 
