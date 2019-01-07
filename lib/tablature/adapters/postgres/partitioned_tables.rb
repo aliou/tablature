@@ -47,11 +47,11 @@ module Tablature
 
         def to_tablature_table(table_name, rows)
           result = rows.first
-          partioning_method = METHOD_MAP.fetch(result['type'])
+          partitioning_method = METHOD_MAP.fetch(result['type'])
           partitions = rows.map { |row| row['partition_name'] }.compact.map(&method(:unquote))
 
           Tablature::PartitionedTable.new(
-            name: table_name, partioning_method: partioning_method, partitions: partitions
+            name: table_name, partitioning_method: partitioning_method, partitions: partitions
           )
         end
 

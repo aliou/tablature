@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
-  it 'returns tablature partionned table object for list partitions' do
+  it 'returns tablature partitioned table object for list partitions' do
     connection = ActiveRecord::Base.connection
     connection.execute <<-SQL
       CREATE TABLE "events" ("id" bigserial NOT NULL) PARTITION BY LIST ("id");
