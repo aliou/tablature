@@ -19,6 +19,10 @@ module Tablature
     # @return [Array]
     attr_reader :partitions
 
+    # The partition key expression.
+    # @return [String]
+    attr_reader :partition_key
+
     # Returns a new instance of PartitionTable.
     #
     # @param name [String] The name of the view.
@@ -29,6 +33,7 @@ module Tablature
       @name = name
       @partitioning_method = partitioning_method
       @partitions = partitions
+      @partition_key = partition_key
     end
   end
 end
