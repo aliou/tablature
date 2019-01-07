@@ -35,5 +35,9 @@ module Tablature
       @partitions = partitions
       @partition_key = partition_key
     end
+
+    def <=>(other)
+      name <=> other.name
+    end
   end
 end
