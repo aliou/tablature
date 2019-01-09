@@ -13,21 +13,27 @@ module Tablature
 
     # The partitioning method of the table
     # @return [Symbol]
-    attr_reader :partioning_method
+    attr_reader :partitioning_method
 
     # The partitions of the table.
     # @return [Array]
     attr_reader :partitions
 
+    # The partition key expression.
+    # @return [String]
+    attr_reader :partition_key
+
     # Returns a new instance of PartitionTable.
     #
     # @param name [String] The name of the view.
-    # @param partioning_method [:symbol] One of :range, :list or :hash
+    # @param partitioning_method [:symbol] One of :range, :list or :hash
     # @param partitions [Array] The partitions of the table.
-    def initialize(name:, partioning_method:, partitions: [])
+    # @param partition_key [String] The partition key expression.
+    def initialize(name:, partitioning_method:, partitions: [], partition_key:)
       @name = name
-      @partioning_method = partioning_method
+      @partitioning_method = partitioning_method
       @partitions = partitions
+      @partition_key = partition_key
     end
   end
 end

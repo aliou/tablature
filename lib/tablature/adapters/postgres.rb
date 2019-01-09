@@ -47,7 +47,7 @@ module Tablature
       # @param [String, Symbol] table_name The name of the table to partition.
       # @param [Hash] options The options to create the partition. Keys besides +:partition_key+
       #   will be passed to +create_table+.
-      # @option options [String, Symbol] :partition_key The partition key.
+      # @option options [String, Symbol, #call] :partition_key The partition key.
       # @yield [td] A TableDefinition object. This allows creating the table columns the same way
       #   as Rails's +create_table+ does.
       #
@@ -84,7 +84,6 @@ module Tablature
       # @param [String, Symbol] table_name The name of the table to partition.
       # @param [Hash] options The options to create the partition. Keys besides +:partition_key+
       #   will be passed to +create_table+.
-      # @option options [String, Symbol] :partition_key The partition key.
       # @yield [td] A TableDefinition object. This allows creating the table columns the same way
       #   as Rails's +create_table+ does.
       #

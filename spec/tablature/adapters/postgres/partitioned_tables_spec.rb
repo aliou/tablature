@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
-  it 'returns tablature partionned table object for list partitions' do
+  it 'returns tablature partitioned table object for list partitions' do
     connection = ActiveRecord::Base.connection
     connection.execute <<-SQL
       CREATE TABLE "events" ("id" bigserial NOT NULL) PARTITION BY LIST ("id");
@@ -9,12 +9,13 @@ RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
     SQL
 
     tables = described_class.new(connection).all
-    first = tables.first
+    partitioned_table = tables.first
 
     expect(tables.size).to eq(1)
-    expect(first.name).to eq('events')
-    expect(first.partioning_method).to eq(:list)
-    expect(first.partitions).to include('events_10')
+    expect(partitioned_table.name).to eq('events')
+    expect(partitioned_table.partition_key).to eq('(id)')
+    expect(partitioned_table.partitioning_method).to eq(:list)
+    expect(partitioned_table.partitions).to include('events_10')
   end
 
   it 'returns tablature partionned table object for range partitions' do
@@ -25,12 +26,13 @@ RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
     SQL
 
     tables = described_class.new(connection).all
-    first = tables.first
+    partitioned_table = tables.first
 
     expect(tables.size).to eq(1)
-    expect(first.name).to eq('events')
-    expect(first.partioning_method).to eq(:range)
-    expect(first.partitions).to include('events_10')
+    expect(partitioned_table.name).to eq('events')
+    expect(partitioned_table.partition_key).to eq('(id)')
+    expect(partitioned_table.partitioning_method).to eq(:range)
+    expect(partitioned_table.partitions).to include('events_10')
   end
 
   it 'returns tablature partionned table object for hash partitions', :postgres_11 do
@@ -43,11 +45,51 @@ RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
     SQL
 
     tables = described_class.new(connection).all
-    first = tables.first
+    partitioned_table = tables.first
 
     expect(tables.size).to eq(1)
-    expect(first.name).to eq('events')
-    expect(first.partioning_method).to eq(:hash)
-    expect(first.partitions).to match_array(['events_0', 'events_1', 'events_2'])
+    expect(partitioned_table.name).to eq('events')
+    expect(partitioned_table.partition_key).to eq('(id)')
+    expect(partitioned_table.partitioning_method).to eq(:hash)
+    expect(partitioned_table.partitions).to match_array(['events_0', 'events_1', 'events_2'])
+  end
+
+  it 'correctly handles partitions with expressions as partition key' do
+    connection = ActiveRecord::Base.connection
+    connection.execute <<-SQL
+      CREATE TABLE "events" ("id" bigserial NOT NULL, ts timestamp NOT NULL) PARTITION BY RANGE ((ts::date));
+      CREATE TABLE "events_2019" PARTITION OF "events" FOR VALUES FROM ('2019-01-01') TO ('2020-01-01');
+    SQL
+
+    tables = described_class.new(connection).all
+    partitioned_table = tables.first
+
+    expect(partitioned_table.partition_key).to eq('(((ts)::date))')
+  end
+
+  it 'correctly handles partitions with multiple columns as partition key' do
+    connection = ActiveRecord::Base.connection
+    connection.execute <<-SQL
+      CREATE TABLE "events" ("id" bigserial NOT NULL, date date NOT NULL) PARTITION BY RANGE (id, date);
+      CREATE TABLE "events_2019" PARTITION OF "events" FOR VALUES FROM (1, '2019-01-01') TO (100, '2020-01-01');
+    SQL
+
+    tables = described_class.new(connection).all
+    partitioned_table = tables.first
+
+    expect(partitioned_table.partition_key).to eq('(id, date)')
+  end
+
+  it 'correctly handles partitions with columns and expressions as partition key' do
+    connection = ActiveRecord::Base.connection
+    connection.execute <<-SQL
+      CREATE TABLE "events" ("id" bigserial NOT NULL, ts timestamp NOT NULL) PARTITION BY RANGE (id, (ts::date));
+      CREATE TABLE "events_2019" PARTITION OF "events" FOR VALUES FROM (1, '2019-01-01') TO (100, '2020-01-01');
+    SQL
+
+    tables = described_class.new(connection).all
+    partitioned_table = tables.first
+
+    expect(partitioned_table.partition_key).to eq('(id, ((ts)::date))')
   end
 end

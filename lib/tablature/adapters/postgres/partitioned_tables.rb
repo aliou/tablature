@@ -25,7 +25,8 @@ module Tablature
               c.oid,
               c.relname AS table_name,
               p.partstrat AS type,
-              (i.inhrelid::REGCLASS)::TEXT AS partition_name
+              (i.inhrelid::REGCLASS)::TEXT AS partition_name,
+              pg_get_partkeydef(c.oid) AS partition_key_definition
             FROM pg_class c
               INNER JOIN pg_partitioned_table p ON c.oid = p.partrelid
               LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
@@ -47,11 +48,17 @@ module Tablature
 
         def to_tablature_table(table_name, rows)
           result = rows.first
-          partioning_method = METHOD_MAP.fetch(result['type'])
+          partitioning_method = METHOD_MAP.fetch(result['type'])
           partitions = rows.map { |row| row['partition_name'] }.compact.map(&method(:unquote))
+          # This is very fragile code. This makes the assumption that:
+          # - Postgres will always have a function `pg_get_partkeydef` that returns the partition
+          # method with the partition key
+          # - Postgres will never have a partition method with two words in its name.
+          _, partition_key = result['partition_key_definition'].split(' ', 2)
 
           Tablature::PartitionedTable.new(
-            name: table_name, partioning_method: partioning_method, partitions: partitions
+            name: table_name, partitioning_method: partitioning_method,
+            partitions: partitions, partition_key: partition_key
           )
         end
 
