@@ -20,7 +20,7 @@ module Tablature
     ActiveRecord::ConnectionAdapters::AbstractAdapter.include Tablature::Statements
     ActiveRecord::Migration::CommandRecorder.include Tablature::CommandRecorder
     ActiveRecord::SchemaDumper.prepend Tablature::SchemaDumper
-    ActiveRecord::Base.prepend Tablature::Model
+    ActiveRecord::Base.include Tablature::Model
   end
 
   # The current database adapter used by Tablature.
@@ -28,5 +28,11 @@ module Tablature
   # This defaults to {Adapters::Postgres} by can be overriden via {Configuration}.
   def self.database
     configuration.database
+  end
+
+  class MissingPartition < StandardError
+    def initialize
+      super('Missing partition')
+    end
   end
 end

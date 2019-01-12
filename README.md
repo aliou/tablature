@@ -55,12 +55,67 @@ class CreateEvents < ActiveRecord::Migration[5.0]
     # Create partitions with the bounds of the partition.
     create_list_partition_of :events_by_list,
       name: 'events_list_y2018m12', values: (Date.parse('2018-12-01')..Date.parse('2018-12-31')).to_a
+
   end
 
   def down
-    drop_table :events
+    drop_table :events_by_range
+    drop_table :events_by_list
   end
 end
+```
+
+### Having a partition back a model
+
+
+In your migration:
+```ruby
+# db/migrate/create_events.rb
+class CreateEvents < ActiveRecord::Migration
+  def change
+    # You can use blocks when the partition key are SQL expression instead of
+    # being only a field.
+    create_range_partition :events, partition_key: -> { '(timestamp::DATE)' } do |t|
+      t.string :event_type, null: false
+      t.integer :value, null: false
+      t.datetime :timestamp, null: false
+      t.timestamps
+    end
+
+    create_range_partition_of :events,
+      name: 'events_y2018m12', range_start: '2018-12-01', range_end: '2019-01-01'
+
+    create_range_partition_of :events,
+      name: 'events_y2019m01', range_start: '2019-01-01', range_end: '2019-02-01'
+  end
+end
+```
+
+In your model, calling one of `range_partition` or `list_partition` to inject
+methods:
+```
+# app/models/event.rb
+class Event < ApplicationRecord
+  range_partition
+end
+```
+
+Finally, you can now list the partitions :
+```ruby
+>> Event.partitions
+# => ["events_y2018m12", "events_y2019m01"]
+```
+
+You can also create new partitions directly from the model :
+```ruby
+>> Event.create_range_partition(
+    name: 'events_y2019m02',
+    range_start: '2019-02-01'.to_date,
+    range_end: '2019-03-01'.to_date
+  )
+# => ...
+>> Event.partitions
+# => ["events_y2018m12", "events_y2019m01", "events_y2019m02"]
 ```
 
 ## Development
