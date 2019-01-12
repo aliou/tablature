@@ -27,6 +27,15 @@ module Tablature
         extend(RangePartitionMethods)
       end
 
+      # @api private
+      def inspect
+        return super unless partitioned?
+
+        # Copied from the Rails source.
+        attr_list = attribute_types.map { |name, type| "#{name}: #{type.type}" } * ', '
+        "#{self}(#{attr_list})"
+      end
+
       private
 
       def setup_partition(partition_name)
