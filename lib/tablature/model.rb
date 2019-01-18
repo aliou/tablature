@@ -58,13 +58,13 @@ module Tablature
       private
 
       def setup_partition(partition_name)
-        class_attribute(:partition_name)
         self.partition_name = partition_name
       end
     end
 
     def self.included(klass)
       klass.extend ClassMethods
+      klass.class_attribute(:partition_name)
     end
   end
 end

@@ -119,7 +119,7 @@ RSpec.describe Tablature::Model, :database do
     describe '.list_partition' do
       let(:model) do
         Class.new do
-          extend Tablature::Model::ClassMethods
+          include Tablature::Model
 
           def self.table_name
             'events'
@@ -142,7 +142,7 @@ RSpec.describe Tablature::Model, :database do
     describe '.range_partition' do
       let(:model) do
         Class.new do
-          extend Tablature::Model::ClassMethods
+          include Tablature::Model
 
           def self.table_name
             'events'
@@ -167,7 +167,8 @@ RSpec.describe Tablature::Model, :database do
     describe '#create_list_partition' do
       let(:model) do
         Class.new do
-          extend Tablature::Model::ListPartitionMethods
+          include Tablature::Model
+          list_partition :events
         end
       end
 
@@ -190,7 +191,8 @@ RSpec.describe Tablature::Model, :database do
     describe '#create_range_partition' do
       let(:model) do
         Class.new do
-          extend Tablature::Model::RangePartitionMethods
+          include Tablature::Model
+          range_partition :events
         end
       end
 
