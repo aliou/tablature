@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    tablature (0.2.0)
+    tablature (0.3.0)
       activerecord (>= 5.0.0)
       railties (>= 5.0.0)
 
@@ -48,7 +48,7 @@ GEM
     method_source (0.9.0)
     mini_portile2 (2.4.0)
     minitest (5.11.3)
-    nokogiri (1.10.0)
+    nokogiri (1.10.1)
       mini_portile2 (~> 2.4.0)
     pg (0.21.0)
     pry (0.12.2)
