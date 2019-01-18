@@ -1,5 +1,3 @@
-require 'tablature/model/partition_methods'
-
 module Tablature
   module Model
     module ListPartitionMethods
@@ -15,15 +13,36 @@ module Tablature
     end
 
     module ClassMethods
+      extend Forwardable
+
+      def_delegators :tablature_partition, :partitions, :partition_key, :partitioning_method
+
+      def partitioned?
+        begin
+          tablature_partition
+        rescue Tablature::MissingPartition
+          return false
+        end
+
+        true
+      end
+
+      def tablature_partition
+        partition = Tablature.database.partitioned_tables.find do |pt|
+          pt.name == partition_name.to_s
+        end
+        raise Tablature::MissingPartition if partition.nil?
+
+        partition
+      end
+
       def list_partition(partition_name = table_name)
         setup_partition(partition_name)
-        extend(PartitionMethods)
         extend(ListPartitionMethods)
       end
 
       def range_partition(partition_name = table_name)
         setup_partition(partition_name)
-        extend(PartitionMethods)
         extend(RangePartitionMethods)
       end
 
