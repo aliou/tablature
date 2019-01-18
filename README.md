@@ -67,7 +67,6 @@ end
 
 ### Having a partition back a model
 
-
 In your migration:
 ```ruby
 # db/migrate/create_events.rb
@@ -116,6 +115,49 @@ You can also create new partitions directly from the model :
 # => ...
 >> Event.partitions
 # => ["events_y2018m12", "events_y2019m01", "events_y2019m02"]
+```
+
+### Partitioning an existing table
+Start by renaming your table and create the partition table:
+```ruby
+class PartitionEvents < ActiveRecord::Migration
+  def change
+    # Get the bounds of the events.
+    min_month = Event.minimum(:timestamp).beginning_of_month.to_date
+    max_month = Event.maximum(:timestamp).beginning_of_month.to_date
+
+    # Create the partition bounds based on the existing data. In this example,
+    # we generate an array with the ranges.
+    months = min_month.upto(max_month).uniq(&:beginning_of_month)
+
+    # Rename the existing table.
+    rename_table :events, :old_events
+
+    # Create the partitioned table.
+    create_range_partition :events, partition_key: -> { '(timestamp::DATE)' } do |t|
+      t.string :event_type, null: false
+      t.integer :value, null: false
+      t.datetime :timestamp, null: false
+      t.timestamps
+    end
+
+    # Create the partitions based on the bounds generated before:
+    months.each do |month|
+      # Creates a name like "events_y2018m12"
+      partition_name = "events_y#{month.year}m#{month.month}"
+
+      create_range_partition_of :events,
+        name: partition_name, range_start: month, range_end: month.next_month
+    end
+
+    # Finally, add the rows from the old table to the new partitioned table.
+    # This might take some time depending on the size of your old table.
+    execute(<<~SQL)
+      INSERT INTO events
+      SELECT * FROM old_events
+    SQL
+  end
+end
 ```
 
 ## Development
