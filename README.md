@@ -92,7 +92,7 @@ end
 
 In your model, calling one of `range_partition` or `list_partition` to inject
 methods:
-```
+```ruby
 # app/models/event.rb
 class Event < ApplicationRecord
   range_partition
