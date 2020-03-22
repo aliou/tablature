@@ -28,12 +28,14 @@ module Tablature
       end
 
       def tablature_partition
-        partition = Tablature.database.partitioned_tables.find do |pt|
+        return @tablature_partition if defined?(@tablature_partition)
+
+        @tablature_partition = Tablature.database.partitioned_tables.find do |pt|
           pt.name == partition_name.to_s
         end
-        raise Tablature::MissingPartition if partition.nil?
+        raise Tablature::MissingPartition if @tablature_partition.nil?
 
-        partition
+        @tablature_partition
       end
 
       def list_partition(partition_name = table_name)

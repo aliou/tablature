@@ -12,11 +12,16 @@ RSpec.describe Tablature::Model, :database do
 
   describe Tablature::Model::ClassMethods do
     describe '#tablature_partition' do
+      after do
+        Event.remove_instance_variable(:@tablature_partition)
+      end
+
       context 'without a custom name' do
         it 'returns the tablature partition' do
           class Event < ActiveRecord::Base
             include Tablature::Model
           end
+
           Event.send(:setup_partition, 'events')
           connection = ActiveRecord::Base.connection
           connection.execute <<-SQL
