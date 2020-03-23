@@ -63,7 +63,7 @@ jobs:
           path: vendor/bundle
           key: bundle-${{ hashFiles('Gemfile.lock') }}
 
-      - name: Set up Scenic
+      - name: Set up Tablature
         run: bin/setup
 
       - name: Run fast tests
