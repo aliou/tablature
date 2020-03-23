@@ -11,3 +11,4 @@ else
 end
 
 gem "rails", rails_constraint
+gem 'database_cleaner'
