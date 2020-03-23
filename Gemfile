@@ -1,3 +1,5 @@
+source "https://rubygems.org"
+
 gemspec
 
 gem 'pry'
@@ -10,5 +12,4 @@ else
   rails_constraint = "~> #{rails_version}.0"
 end
 
-gem "rails", rails_constraint
-gem 'database_cleaner'
+gem 'rails', rails_constraint
