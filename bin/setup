@@ -6,3 +6,12 @@ set -vx
 bundle install
 
 # Do any other automated setup that you need to do here
+
+# CI-specific setup
+ if [ -n "$CI" ]; then
+   bundle config path vendor/bundle
+   bundle config jobs 4
+   bundle config retry 3
+   git config --global user.name 'GitHub Actions'
+   git config --global user.email 'github-actions@example.com'
+ fi
