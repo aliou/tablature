@@ -11,6 +11,13 @@ module Tablature
         end
       end
 
+      # Raised when trying to attach or detach a partition without supplying a name.
+      class MissingPartitionName < StandardError
+        def initialize
+          super('Missing partition name')
+        end
+      end
+
       # Raised when a list partition operation is attempted on a database
       # version that does not support list partitions.
       #
