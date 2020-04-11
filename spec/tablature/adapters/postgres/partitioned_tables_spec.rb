@@ -92,4 +92,18 @@ RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
 
     expect(partitioned_table.partition_key).to eq('(id, ((ts)::date))')
   end
+
+  it 'correctly handles the default partition', :postgres_11 do
+    connection = ActiveRecord::Base.connection
+    connection.execute <<-SQL
+      CREATE TABLE "events" ("id" bigserial NOT NULL) PARTITION BY LIST ("id");
+      CREATE TABLE "events_10" PARTITION OF "events" FOR VALUES IN (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+      CREATE TABLE "events_default" PARTITION OF "events" DEFAULT;
+    SQL
+
+    tables = described_class.new(connection).all
+    partitioned_table = tables.first
+
+    expect(partitioned_table.default_partition.name).to eq('events_default')
+  end
 end

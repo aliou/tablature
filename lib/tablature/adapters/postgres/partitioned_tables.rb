@@ -23,10 +23,12 @@ module Tablature
           connection.execute(<<-SQL)
             SELECT
               c.oid,
+              i.inhrelid,
               c.relname AS table_name,
               p.partstrat AS type,
               (i.inhrelid::REGCLASS)::TEXT AS partition_name,
-              pg_get_partkeydef(c.oid) AS partition_key_definition
+              pg_get_partkeydef(c.oid) AS partition_key_definition,
+              i.inhrelid = p.partdefid AS is_default_partition
             FROM pg_class c
               INNER JOIN pg_partitioned_table p ON c.oid = p.partrelid
               LEFT JOIN pg_namespace n ON n.oid = c.relnamespace

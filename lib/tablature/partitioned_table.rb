@@ -5,7 +5,7 @@ module Tablature
   # not intended to be used by application code. It is documented here for
   # use by adapter gems.**
   #
-  # @api extension
+  # @api private
   class PartitionedTable
     # The name of the partitioned table
     # @return [String]
@@ -35,16 +35,26 @@ module Tablature
     # @param partitioning_method [:symbol] One of :range, :list or :hash
     # @param partitions [Array] The partitions of the table.
     # @param partition_key [String] The partition key expression.
+    # @api private
     def initialize(name:, partitioning_method:, partitions: [], partition_key:)
       @name = name
       @partitioning_method = partitioning_method
       @partitions = partitions.map do |row|
         Tablature::Partition.new(
           name: row['partition_name'],
-          parent_table_name: row['table_name']
+          parent_table_name: row['table_name'],
+          default_partition: row['is_default_partition']
         )
       end
       @partition_key = partition_key
+    end
+
+    # Returns the representation of the default partition if present.
+    #
+    # @return [Tablature::Partition]
+    # @api private
+    def default_partition
+      partitions.find(&:default_partition?)
     end
   end
 end
