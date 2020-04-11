@@ -15,7 +15,7 @@ RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
     expect(partitioned_table.name).to eq('events')
     expect(partitioned_table.partition_key).to eq('(id)')
     expect(partitioned_table.partitioning_method).to eq(:list)
-    expect(partitioned_table.partitions).to include('events_10')
+    expect(partitioned_table.partitions.map(&:name)).to include('events_10')
   end
 
   it 'returns tablature partionned table object for range partitions' do
@@ -32,7 +32,7 @@ RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
     expect(partitioned_table.name).to eq('events')
     expect(partitioned_table.partition_key).to eq('(id)')
     expect(partitioned_table.partitioning_method).to eq(:range)
-    expect(partitioned_table.partitions).to include('events_10')
+    expect(partitioned_table.partitions.map(&:name)).to include('events_10')
   end
 
   it 'returns tablature partionned table object for hash partitions', :postgres_11 do
@@ -51,7 +51,7 @@ RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
     expect(partitioned_table.name).to eq('events')
     expect(partitioned_table.partition_key).to eq('(id)')
     expect(partitioned_table.partitioning_method).to eq(:hash)
-    expect(partitioned_table.partitions).to match_array(['events_0', 'events_1', 'events_2'])
+    expect(partitioned_table.partitions.map(&:name)).to match_array(['events_0', 'events_1', 'events_2'])
   end
 
   it 'correctly handles partitions with expressions as partition key' do

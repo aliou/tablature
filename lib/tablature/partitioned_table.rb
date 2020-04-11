@@ -9,18 +9,24 @@ module Tablature
   class PartitionedTable
     # The name of the partitioned table
     # @return [String]
+    # @api private
     attr_reader :name
+
+    # TODO: Rename to partition_strategy
 
     # The partitioning method of the table
     # @return [Symbol]
+    # @api private
     attr_reader :partitioning_method
 
     # The partitions of the table.
     # @return [Array]
+    # @api private
     attr_reader :partitions
 
     # The partition key expression.
     # @return [String]
+    # @api private
     attr_reader :partition_key
 
     # Returns a new instance of PartitionTable.
@@ -32,7 +38,12 @@ module Tablature
     def initialize(name:, partitioning_method:, partitions: [], partition_key:)
       @name = name
       @partitioning_method = partitioning_method
-      @partitions = partitions
+      @partitions = partitions.map do |row|
+        Tablature::Partition.new(
+          name: row['partition_name'],
+          parent_table_name: row['table_name']
+        )
+      end
       @partition_key = partition_key
     end
   end

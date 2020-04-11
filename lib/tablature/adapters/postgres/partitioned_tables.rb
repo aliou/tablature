@@ -49,7 +49,6 @@ module Tablature
         def to_tablature_table(table_name, rows)
           result = rows.first
           partitioning_method = METHOD_MAP.fetch(result['type'])
-          partitions = rows.map { |row| row['partition_name'] }.compact.map(&method(:unquote))
           # This is very fragile code. This makes the assumption that:
           # - Postgres will always have a function `pg_get_partkeydef` that returns the partition
           # method with the partition key
@@ -58,7 +57,7 @@ module Tablature
 
           Tablature::PartitionedTable.new(
             name: table_name, partitioning_method: partitioning_method,
-            partitions: partitions, partition_key: partition_key
+            partitions: rows, partition_key: partition_key
           )
         end
 
