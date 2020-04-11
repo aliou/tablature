@@ -1,6 +1,16 @@
 module Tablature
   module Adapters
     class Postgres
+      # Raised when a setting a partition as default  on a database
+      # version that does not support default partitions.
+      #
+      # default partitions are supported on Postgres 11 or newer.
+      class DefaultPartitionNotSupportedError < StandardError
+        def initialize
+          super('Default partitions require Postgres 11 or newer')
+        end
+      end
+
       # Raised when a list partition operation is attempted on a database
       # version that does not support list partitions.
       #

@@ -68,6 +68,7 @@ module Tablature
       # @option options [String, Symbol] :values The values appearing in the partition.
       # @option options [String, Symbol] :name The name of the partition. If it is not given, this
       #   will be randomly generated.
+      # @option options [Boolean] :default Whether the partition is the default partition or not.
       #
       # @example
       #   # With a table :events partitioned using the list method on the partition key `date`:
@@ -108,6 +109,7 @@ module Tablature
       #   the partition.
       # @option options [String, Symbol] :name The name of the partition. If it is not given, this
       #   will be randomly generated.
+      # @option options [Boolean] :default Whether the partition is the default partition or not.
       #
       # @example
       #   # With a table :events partitioned using the range method on the partition key `date`:
