@@ -4,6 +4,8 @@ module Tablature
       # Fetches the defined partitioned tables from the postgres connection.
       # @api private
       class PartitionedTables
+        include Enumerable
+
         def initialize(connection)
           @connection = connection
         end
@@ -13,6 +15,10 @@ module Tablature
         # @return [Array<Tablature::PartitionedTable>]
         def all
           partitions.group_by { |row| row['table_name'] }.map(&method(:to_tablature_table))
+        end
+
+        def each(&block)
+          all.each(&block)
         end
 
         private

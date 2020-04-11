@@ -115,14 +115,14 @@ module Tablature
       #                                                               range_end: '2018-12-10'
       delegate :create_range_partition_of, to: :range_handler
 
-      # Returns an array of partitioned tables in the database.
+      # Returns an array like object encapsulating the partitioned tables in the database.
       #
       # This collection of tables is used by the [Tablature::SchemaDumper] to populate the schema.rb
       # file.
       #
-      # @return [Array<Tablature::PartitionedTable]
+      # @return [Tablature::PartitionedTables]
       def partitioned_tables
-        PartitionedTables.new(connection).all
+        PartitionedTables.new(connection)
       end
 
       private
