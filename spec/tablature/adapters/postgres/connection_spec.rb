@@ -38,7 +38,7 @@ RSpec.describe Tablature::Adapters::Postgres::Connection do
       base_connection = double('Connection', postgresql_version: 110_000)
       connection = described_class.new(base_connection)
 
-      expect(connection.supports_list_partitions?).to eq(true)
+      expect(connection.supports_hash_partitions?).to eq(true)
     end
 
     it 'is false if the postgres version is less than 11.0' do
