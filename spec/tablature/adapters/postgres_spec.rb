@@ -36,7 +36,7 @@ RSpec.describe Tablature::Adapters::Postgres, :database do
   end
 
   describe '#attach_to_list_partition' do
-    it 'raises if the list values are missing' do
+    it 'raises if the both the list values and the default flag are missing' do
       adapter = described_class.new
       adapter.create_list_partition 'events', partition_key: 'event_id' do |t|
         t.integer :event_id, null: false
@@ -49,6 +49,23 @@ RSpec.describe Tablature::Adapters::Postgres, :database do
         .to raise_error described_class::MissingListPartitionValuesError
     end
 
+    it 'raises if the default flag is given but default partitions are not supported' do
+      adapter = described_class.new
+      adapter.create_list_partition 'events', partition_key: 'event_id' do |t|
+        t.integer :event_id, null: false
+      end
+
+      adapter.create_list_partition_of('events', name: 'events_a', values: [1, 2])
+      adapter.detach_from_list_partition('events', name: 'events_a')
+
+      connection = double('Connection', postgresql_version: 0)
+      connectable = double('Connectable', connection: connection)
+      adapter = described_class.new(connectable)
+
+      expect { adapter.attach_to_list_partition('events', name: 'events_a', default: true) }
+        .to raise_error described_class::DefaultPartitionNotSupportedError
+    end
+
     it 'raises if the name is missing' do
       adapter = described_class.new
       adapter.create_list_partition 'events', partition_key: 'event_id' do |t|
@@ -58,7 +75,7 @@ RSpec.describe Tablature::Adapters::Postgres, :database do
       adapter.create_list_partition_of('events', name: 'events_a', values: [1, 2])
       adapter.detach_from_list_partition('events', name: 'events_a')
 
-      expect { adapter.attach_to_list_partition('events', default: true) }
+      expect { adapter.attach_to_list_partition('events', values: [1, 2]) }
         .to raise_error described_class::MissingPartitionName
     end
 

@@ -49,6 +49,22 @@ RSpec.describe Tablature::Adapters::Postgres::Connection do
     end
   end
 
+  describe '#supports_default_partitions?' do
+    it 'is true if the postgres version is at least 11.0' do
+      base_connection = double('Connection', postgresql_version: 110_000)
+      connection = described_class.new(base_connection)
+
+      expect(connection.supports_default_partitions?).to eq(true)
+    end
+
+    it 'is false if the postgres version is less than 11.0' do
+      base_connection = double('Connection', postgresql_version: 109_999)
+      connection = described_class.new(base_connection)
+
+      expect(connection.supports_default_partitions?).to eq(false)
+    end
+  end
+
   describe '#postgresql_version' do
     it 'uses the public method on the provided connection if defined' do
       base_connection = Class.new do

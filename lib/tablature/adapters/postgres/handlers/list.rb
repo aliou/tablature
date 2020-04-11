@@ -48,6 +48,8 @@ module Tablature
             as_default = options.fetch(:default, false)
             raise MissingListPartitionValuesError if values.blank? && !as_default
 
+            raise_unless_default_partition_supported if as_default
+
             name = options.fetch(:name) { raise MissingPartitionName }
             query =
               if as_default
@@ -85,6 +87,10 @@ module Tablature
 
           def raise_unless_list_partition_supported
             raise ListPartitionsNotSupportedError unless connection.supports_list_partitions?
+          end
+
+          def raise_unless_default_partition_supported
+            raise DefaultPartitionNotSupportedError unless connection.supports_default_partitions?
           end
 
           # TODO: Better ?
