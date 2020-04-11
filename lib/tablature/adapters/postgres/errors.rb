@@ -15,7 +15,7 @@ module Tablature
       # key.
       class MissingListPartitionValuesError < StandardError
         def initialize
-          super('Missing values for of list partition')
+          super('Missing values for list partition')
         end
       end
 
@@ -33,7 +33,7 @@ module Tablature
       # key.
       class MissingRangePartitionBoundsError < StandardError
         def initialize
-          super('Missing bounds for of range partition')
+          super('Missing bounds for range partition')
         end
       end
     end
