@@ -31,6 +31,13 @@ module Tablature
           postgresql_version >= 110_000
         end
 
+        # True if the connection supports default partitions.
+        #
+        # @return [Boolean]
+        def supports_default_partitions?
+          postgresql_version >= 110_000
+        end
+
         # An integer representing the version of Postgres we're connected to.
         #
         # +postgresql_version+ is public in Rails 5, but protected in earlier
