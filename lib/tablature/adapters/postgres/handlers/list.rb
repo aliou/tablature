@@ -43,6 +43,39 @@ module Tablature
             execute(query)
           end
 
+          def attach_to_list_partition(parent_table, options)
+            values = options.fetch(:values, [])
+            as_default = options.fetch(:default, false)
+            raise MissingListPartitionValuesError if values.blank? && !as_default
+
+            name = options.fetch(:name) { raise MissingPartitionName }
+            query =
+              if as_default
+                <<~SQL.strip
+                  ALTER TABLE #{quote_table_name(parent_table)}
+                  ATTACH PARTITION #{quote_table_name(name)} DEFAULT
+                SQL
+              else
+                <<~SQL.strip
+                  ALTER TABLE #{quote_table_name(parent_table)}
+                  ATTACH PARTITION #{quote_table_name(name)}
+                  FOR VALUES IN (#{quote_collection(values)})
+                SQL
+              end
+
+            execute(query)
+          end
+
+          def detach_from_list_partition(parent_table, options)
+            name = options.fetch(:name) { raise MissingPartitionName }
+            query = <<~SQL.strip
+              ALTER TABLE #{quote_table_name(parent_table)}
+              DETACH PARTITION #{quote_table_name(name)}
+            SQL
+
+            execute(query)
+          end
+
           private
 
           attr_reader :connection

@@ -1,6 +1,11 @@
 module Tablature
   module Adapters
     class Postgres
+      class MissingPartitionName < StandardError
+        def initialize
+          super('Missing partition name')
+        end
+      end
       # Raised when a list partition operation is attempted on a database
       # version that does not support list partitions.
       #
