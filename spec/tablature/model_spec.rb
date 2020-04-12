@@ -131,7 +131,7 @@ RSpec.describe Tablature::Model, :database do
       end
     end
 
-    describe '#partitioning_method' do
+    describe '#partitioning_strategy' do
       let(:model) do
         Class.new(ActiveRecord::Base) do
           include Tablature::Model
@@ -142,8 +142,8 @@ RSpec.describe Tablature::Model, :database do
         tablature_partition_double = double(Tablature::PartitionedTable)
         allow(model).to receive(:tablature_partition).and_return(tablature_partition_double)
 
-        expect(tablature_partition_double).to receive(:partitioning_method)
-        model.partitioning_method
+        expect(tablature_partition_double).to receive(:partitioning_strategy)
+        model.partitioning_strategy
       end
     end
 
@@ -161,7 +161,7 @@ RSpec.describe Tablature::Model, :database do
         expect(model.partition_name).to eq('events')
       end
 
-      it 'extend the partition methods and list partition methods' do
+      it 'extends the model with list partition methods' do
         expect(model).to receive(:extend).with(Tablature::Model::ListPartitionMethods)
         model.list_partition
       end
@@ -181,7 +181,7 @@ RSpec.describe Tablature::Model, :database do
         expect(model.partition_name).to eq('events')
       end
 
-      it 'extend the partition methods and range partition methods' do
+      it 'extends the model with range partition methods' do
         expect(model).to receive(:extend).with(Tablature::Model::RangePartitionMethods)
         model.range_partition
       end

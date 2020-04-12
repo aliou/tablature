@@ -12,12 +12,10 @@ module Tablature
     # @api private
     attr_reader :name
 
-    # TODO: Rename to partition_strategy
-
-    # The partitioning method of the table
+    # The partitioning strategy of the table
     # @return [Symbol]
     # @api private
-    attr_reader :partitioning_method
+    attr_reader :partitioning_strategy
 
     # The partitions of the table.
     # @return [Array]
@@ -32,13 +30,13 @@ module Tablature
     # Returns a new instance of PartitionTable.
     #
     # @param name [String] The name of the view.
-    # @param partitioning_method [:symbol] One of :range, :list or :hash
+    # @param partitioning_strategy [:symbol] One of :range, :list or :hash
     # @param partitions [Array] The partitions of the table.
     # @param partition_key [String] The partition key expression.
     # @api private
-    def initialize(name:, partitioning_method:, partitions: [], partition_key:)
+    def initialize(name:, partitioning_strategy:, partitions: [], partition_key:)
       @name = name
-      @partitioning_method = partitioning_method
+      @partitioning_strategy = partitioning_strategy
       @partitions = partitions.map do |row|
         Tablature::Partition.new(
           name: row['partition_name'],

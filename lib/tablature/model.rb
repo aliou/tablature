@@ -15,7 +15,7 @@ module Tablature
     module ClassMethods
       extend Forwardable
 
-      def_delegators :tablature_partition, :partitions, :partition_key, :partitioning_method
+      def_delegators :tablature_partition, :partitions, :partition_key, :partitioning_strategy
 
       def partitioned?
         begin

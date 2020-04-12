@@ -25,7 +25,7 @@ module Tablature
               c.oid,
               i.inhrelid,
               c.relname AS table_name,
-              p.partstrat AS type,
+              p.partstrat AS strategy,
               (i.inhrelid::REGCLASS)::TEXT AS partition_name,
               #{connection.supports_default_partitions? ? 'i.inhrelid = p.partdefid AS is_default_partition,' : ''}
               pg_get_partkeydef(c.oid) AS partition_key_definition
@@ -41,24 +41,24 @@ module Tablature
           SQL
         end
 
-        METHOD_MAP = {
+        STRATEGY_MAP = {
           'l' => :list,
           'r' => :range,
           'h' => :hash
         }.freeze
-        private_constant :METHOD_MAP
+        private_constant :STRATEGY_MAP
 
         def to_tablature_table(table_name, rows)
           result = rows.first
-          partitioning_method = METHOD_MAP.fetch(result['type'])
+          partitioning_strategy = STRATEGY_MAP.fetch(result['strategy'])
           # This is very fragile code. This makes the assumption that:
           # - Postgres will always have a function `pg_get_partkeydef` that returns the partition
-          # method with the partition key
-          # - Postgres will never have a partition method with two words in its name.
+          # strategy with the partition key
+          # - Postgres will never have a partition strategy with two words in its name.
           _, partition_key = result['partition_key_definition'].split(' ', 2)
 
           Tablature::PartitionedTable.new(
-            name: table_name, partitioning_method: partitioning_method,
+            name: table_name, partitioning_strategy: partitioning_strategy,
             partitions: rows, partition_key: partition_key
           )
         end
