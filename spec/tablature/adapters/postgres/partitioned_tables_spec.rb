@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
   it 'returns tablature partitioned table object for list partitions' do
-    connection = ActiveRecord::Base.connection
+    connection = Tablature::Adapters::Postgres::Connection.new(ActiveRecord::Base.connection)
     connection.execute <<-SQL
       CREATE TABLE "events" ("id" bigserial NOT NULL) PARTITION BY LIST ("id");
       CREATE TABLE "events_10" PARTITION OF "events" FOR VALUES IN (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
@@ -19,7 +19,7 @@ RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
   end
 
   it 'returns tablature partionned table object for range partitions' do
-    connection = ActiveRecord::Base.connection
+    connection = Tablature::Adapters::Postgres::Connection.new(ActiveRecord::Base.connection)
     connection.execute <<-SQL
       CREATE TABLE "events" ("id" bigserial NOT NULL) PARTITION BY RANGE ("id");
       CREATE TABLE "events_10" PARTITION OF "events" FOR VALUES FROM (0) TO (10);
@@ -36,7 +36,7 @@ RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
   end
 
   it 'returns tablature partionned table object for hash partitions', :postgres_11 do
-    connection = ActiveRecord::Base.connection
+    connection = Tablature::Adapters::Postgres::Connection.new(ActiveRecord::Base.connection)
     connection.execute <<-SQL
       CREATE TABLE "events" ("id" bigserial NOT NULL) PARTITION BY HASH ("id");
       CREATE TABLE "events_0" PARTITION OF events FOR VALUES WITH (MODULUS 3, REMAINDER 0);
@@ -55,7 +55,7 @@ RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
   end
 
   it 'correctly handles partitions with expressions as partition key' do
-    connection = ActiveRecord::Base.connection
+    connection = Tablature::Adapters::Postgres::Connection.new(ActiveRecord::Base.connection)
     connection.execute <<-SQL
       CREATE TABLE "events" ("id" bigserial NOT NULL, ts timestamp NOT NULL) PARTITION BY RANGE ((ts::date));
       CREATE TABLE "events_2019" PARTITION OF "events" FOR VALUES FROM ('2019-01-01') TO ('2020-01-01');
@@ -68,7 +68,7 @@ RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
   end
 
   it 'correctly handles partitions with multiple columns as partition key' do
-    connection = ActiveRecord::Base.connection
+    connection = Tablature::Adapters::Postgres::Connection.new(ActiveRecord::Base.connection)
     connection.execute <<-SQL
       CREATE TABLE "events" ("id" bigserial NOT NULL, date date NOT NULL) PARTITION BY RANGE (id, date);
       CREATE TABLE "events_2019" PARTITION OF "events" FOR VALUES FROM (1, '2019-01-01') TO (100, '2020-01-01');
@@ -81,7 +81,7 @@ RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
   end
 
   it 'correctly handles partitions with columns and expressions as partition key' do
-    connection = ActiveRecord::Base.connection
+    connection = Tablature::Adapters::Postgres::Connection.new(ActiveRecord::Base.connection)
     connection.execute <<-SQL
       CREATE TABLE "events" ("id" bigserial NOT NULL, ts timestamp NOT NULL) PARTITION BY RANGE (id, (ts::date));
       CREATE TABLE "events_2019" PARTITION OF "events" FOR VALUES FROM (1, '2019-01-01') TO (100, '2020-01-01');
@@ -94,7 +94,7 @@ RSpec.describe Tablature::Adapters::Postgres::PartitionedTables, :database do
   end
 
   it 'correctly handles the default partition', :postgres_11 do
-    connection = ActiveRecord::Base.connection
+    connection = Tablature::Adapters::Postgres::Connection.new(ActiveRecord::Base.connection)
     connection.execute <<-SQL
       CREATE TABLE "events" ("id" bigserial NOT NULL) PARTITION BY LIST ("id");
       CREATE TABLE "events_10" PARTITION OF "events" FOR VALUES IN (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
