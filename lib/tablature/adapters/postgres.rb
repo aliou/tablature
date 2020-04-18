@@ -73,7 +73,8 @@ module Tablature
       # @example
       #   # With a table :events partitioned using the list method on the partition key `date`:
       #   create_list_partition_of :events, name: "events_2018-W49", values: [
-      #     "2018-12-03", "2018-12-04", "2018-12-05", "2018-12-06", "2018-12-07", "2018-12-08", "2018-12-09"
+      #     "2018-12-03", "2018-12-04", "2018-12-05", "2018-12-06", "2018-12-07", "2018-12-08",
+      #     "2018-12-09"
       #   ]
       delegate :create_list_partition_of, to: :list_handler
 
@@ -88,7 +89,8 @@ module Tablature
       # @example
       #   # With a table :events partitioned using the list method on the partition key `date`:
       #   attach_to_list_partition :events, name: "events_2018-W49", values: [
-      #     "2018-12-03", "2018-12-04", "2018-12-05", "2018-12-06", "2018-12-07", "2018-12-08", "2018-12-09"
+      #     "2018-12-03", "2018-12-04", "2018-12-05", "2018-12-06", "2018-12-07", "2018-12-08",
+      #     "2018-12-09"
       #   ]
       delegate :attach_to_list_partition, to: :list_handler
 
