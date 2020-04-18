@@ -13,6 +13,10 @@ module Tablature
 
           protected
 
+          def raise_unless_default_partition_supported
+            raise DefaultPartitionNotSupportedError unless connection.supports_default_partitions?
+          end
+
           def create_partition(table_name, id_options, table_options, &block)
             create_table(table_name, table_options) do |td|
               # TODO: Handle the id things here (depending on the postgres version)

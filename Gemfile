@@ -2,6 +2,7 @@ source "https://rubygems.org"
 gemspec
 
 gem 'pry'
+gem 'rubocop'
 
 rails_version = ENV.fetch("RAILS_VERSION", "6.0")
 

@@ -31,17 +31,27 @@ module Tablature
           def create_range_partition_of(parent_table, options)
             range_start = options.fetch(:range_start, nil)
             range_end = options.fetch(:range_end, nil)
+            as_default = options.fetch(:default, false)
 
-            raise MissingRangePartitionBoundsError if range_start.nil? || range_end.nil?
+            raise_unless_default_partition_supported if as_default
+            if (range_start.nil? || range_end.nil?) && !as_default
+              raise MissingRangePartitionBoundsError
+            end
 
             name = options.fetch(:name, partition_name(parent_table, range_start, range_end))
             # TODO: Call `create_table` here instead of running the query.
             # TODO: Pass the options to `create_table` to allow further configuration of the table,
             # e.g. sub-partitioning the table.
-            query = <<~SQL.strip
+
+            query = <<~SQL
               CREATE TABLE #{quote_table_name(name)} PARTITION OF #{quote_table_name(parent_table)}
-              FOR VALUES FROM (#{quote(range_start)}) TO (#{quote(range_end)});
             SQL
+
+            query += if as_default
+                       'DEFAULT'
+                     else
+                       "FOR VALUES FROM (#{quote(range_start)}) TO (#{quote(range_end)})"
+                     end
 
             execute(query)
           end

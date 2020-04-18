@@ -29,16 +29,25 @@ module Tablature
 
           def create_list_partition_of(parent_table, options)
             values = options.fetch(:values, [])
-            raise MissingListPartitionValuesError if values.blank?
+            as_default = options.fetch(:default, false)
+
+            raise_unless_default_partition_supported if as_default
+            raise MissingListPartitionValuesError if values.blank? && !as_default
 
             name = options.fetch(:name, partition_name(parent_table, values))
             # TODO: Call `create_table` here instead of running the query.
             # TODO: Pass the options to `create_table` to allow further configuration of the table,
             # e.g. sub-partitioning the table.
-            query = <<~SQL.strip
+
+            query = <<~SQL
               CREATE TABLE #{quote_table_name(name)} PARTITION OF #{quote_table_name(parent_table)}
-              FOR VALUES IN (#{quote_collection(values)})
             SQL
+
+            query += if as_default
+                       'DEFAULT'
+                     else
+                       "FOR VALUES IN (#{quote_collection(values)})"
+                     end
 
             execute(query)
           end

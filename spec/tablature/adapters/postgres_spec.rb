@@ -24,7 +24,7 @@ RSpec.describe Tablature::Adapters::Postgres, :database do
   end
 
   describe '#create_list_partition_of' do
-    it 'raises if the list values are missing' do
+    it 'raises if the list values and the default flag are missing' do
       adapter = described_class.new
       adapter.create_list_partition 'events', partition_key: 'event_id' do |t|
         t.integer :event_id, null: false
@@ -32,6 +32,33 @@ RSpec.describe Tablature::Adapters::Postgres, :database do
 
       expect { adapter.create_list_partition_of('events', values: nil) }
         .to raise_error described_class::MissingListPartitionValuesError
+    end
+
+    it 'raises if default partitions are not supported' do
+      adapter = described_class.new
+      adapter.create_list_partition 'events', partition_key: 'event_id' do |t|
+        t.integer :event_id, null: false
+      end
+
+      # TODO: Find a way to mock `supports_default_partitions?` instead of the postgres version.
+      connection = double('Connection', postgresql_version: 0)
+      connectable = double('Connectable', connection: connection)
+      adapter = described_class.new(connectable)
+
+      expect { adapter.create_list_partition_of('events', default: true) }
+        .to raise_error described_class::DefaultPartitionNotSupportedError
+    end
+
+    it 'creates the partition' do
+      adapter = described_class.new
+      adapter.create_list_partition 'events', partition_key: 'event_id' do |t|
+        t.integer :event_id, null: false
+      end
+
+      adapter.create_list_partition_of('events', values: [1, 2, 3], name: 'events_1')
+      partitioned_table = adapter.partitioned_tables.first
+
+      expect(partitioned_table.partitions.map(&:name)).to include('events_1')
     end
   end
 
@@ -66,6 +93,33 @@ RSpec.describe Tablature::Adapters::Postgres, :database do
 
       expect { adapter.create_range_partition_of('events', range_start: nil) }
         .to raise_error described_class::MissingRangePartitionBoundsError
+    end
+
+    it 'raises if default partitions are not supported' do
+      adapter = described_class.new
+      adapter.create_range_partition 'events', partition_key: 'event_id' do |t|
+        t.integer :event_id, null: false
+      end
+
+      # TODO: Find a way to mock `supports_default_partitions?` instead of the postgres version.
+      connection = double('Connection', postgresql_version: 0)
+      connectable = double('Connectable', connection: connection)
+      adapter = described_class.new(connectable)
+
+      expect { adapter.create_range_partition_of('events', default: true) }
+        .to raise_error described_class::DefaultPartitionNotSupportedError
+    end
+
+    it 'creates the partition' do
+      adapter = described_class.new
+      adapter.create_range_partition 'events', partition_key: 'event_id' do |t|
+        t.integer :event_id, null: false
+      end
+
+      adapter.create_range_partition_of('events', range_start: 0, range_end: 10, name: 'events_1')
+      partitioned_table = adapter.partitioned_tables.first
+
+      expect(partitioned_table.partitions.map(&:name)).to include('events_1')
     end
   end
 end

@@ -16,7 +16,7 @@ module Tablature
     end
 
     def partitions
-      dumpable_partitioned_tables.flat_map(&:partitions)
+      dumpable_partitioned_tables.flat_map { |t| t.partitions.map(&:name) }
     end
   end
 end
