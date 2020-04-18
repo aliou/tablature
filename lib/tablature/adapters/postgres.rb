@@ -132,12 +132,12 @@ module Tablature
       #
       # @param parent_table_name [String, Symbol] The name of the parent table.
       # @param [Hash] options The options to create the partition.
+      # @option options [String, Symbol] :name The name of the partition. If it is not given, this
+      #   will be randomly generated.
       # @option options [String, Symbol] :range_start The start of the range of values appearing in
       #   the partition.
       # @option options [String, Symbol] :range_end The end of the range of values appearing in
       #   the partition.
-      # @option options [String, Symbol] :name The name of the partition. If it is not given, this
-      #   will be randomly generated.
       # @option options [Boolean] :default Whether the partition is the default partition or not.
       #
       # @example
@@ -145,6 +145,35 @@ module Tablature
       #   create_range_partition_of :events, name: "events_2018-W49", range_start: '2018-12-03',
       #                                                               range_end: '2018-12-10'
       delegate :create_range_partition_of, to: :range_handler
+
+      # @!method attach_to_range_partition(parent_table_name, options)
+      # Attaches a partition to a parent by specifying the key values appearing in the partition.
+      #
+      # @param parent_table_name [String, Symbol] The name of the parent table.
+      # @param [Hash] options The options to create the partition.
+      # @option options [String, Symbol] :name The name of the partition.
+      # @option options [String, Symbol] :range_start The start of the range of values appearing in
+      #   the partition.
+      # @option options [String, Symbol] :range_end The end of the range of values appearing in
+      #   the partition.
+      # @option options [Boolean] :default Whether the partition is the default partition or not.
+      #
+      # @example
+      #   # With a table :events partitioned using the range method on the partition key `date`:
+      #   attach_to_range_partition :events, name: "events_2018-W49", range_start: '2018-12-03',
+      #                                                               range_end: '2018-12-10'
+      delegate :attach_to_range_partition, to: :range_handler
+
+      # @!method detach_from_range_partition(parent_table_name, options)
+      # Detaches a partition from a parent.
+      #
+      # @param parent_table_name [String, Symbol] The name of the parent table.
+      # @param [Hash] options The options to detach the partition.
+      # @option options [String, Symbol] :name The name of the partition.
+      #
+      # @example
+      #   detach_from_range_partition :events, name: "events_2018-W49"
+      delegate :detach_from_range_partition, to: :range_handler
 
       # Returns an array of partitioned tables in the database.
       #

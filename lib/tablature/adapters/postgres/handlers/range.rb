@@ -56,6 +56,36 @@ module Tablature
             execute(query)
           end
 
+          def attach_to_range_partition(parent_table, options)
+            range_start = options.fetch(:range_start, nil)
+            range_end = options.fetch(:range_end, nil)
+            as_default = options.fetch(:default, false)
+
+            raise_unless_default_partition_supported if as_default
+            if (range_start.nil? || range_end.nil?) && !as_default
+              raise MissingRangePartitionBoundsError
+            end
+
+            name = options.fetch(:name) { raise MissingPartitionName }
+
+            if as_default
+              attach_default_partition(parent_table, name)
+            else
+              attach_partition(parent_table, name, range_start, range_end)
+            end
+          end
+
+          def detach_from_range_partition(parent_table, options)
+            name = options.fetch(:name) { raise MissingPartitionName }
+
+            query = <<~SQL.strip
+              ALTER TABLE #{quote_table_name(parent_table)}
+              DETACH PARTITION #{quote_table_name(name)}
+            SQL
+
+            execute(query)
+          end
+
           private
 
           attr_reader :connection
@@ -70,6 +100,25 @@ module Tablature
           def partition_name(parent_table, range_start, range_end)
             key = [range_start, range_end].join(', ')
             "#{parent_table}_#{Digest::MD5.hexdigest(key)[0..6]}"
+          end
+
+          def attach_default_partition(parent_table, partition_name)
+            query = <<~SQL.strip
+              ALTER TABLE #{quote_table_name(parent_table)}
+              ATTACH PARTITION #{quote_table_name(partition_name)} DEFAULT
+            SQL
+
+            execute(query)
+          end
+
+          def attach_partition(parent_table, partition_name, range_start, range_end)
+            query = <<~SQL.strip
+              ALTER TABLE #{quote_table_name(parent_table)}
+              ATTACH PARTITION #{quote_table_name(partition_name)}
+              FOR VALUES FROM (#{quote(range_start)}) TO (#{quote(range_end)})
+            SQL
+
+            execute(query)
           end
         end
       end
