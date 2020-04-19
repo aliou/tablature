@@ -7,7 +7,7 @@ It ships with Postgres support and can easily supports other databases through a
 
 ##### Requirements
 
-Tablature requires Rails 5+ and Postgres 10+.
+Tablature requires Ruby 2.5+, Rails 5+ and Postgres 10+.
 
 ##### Installation
 
