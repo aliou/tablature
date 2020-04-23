@@ -54,5 +54,9 @@ module Tablature
     def default_partition
       partitions.find(&:default_partition?)
     end
+
+    def <=>(other)
+      name <=> other.name
+    end
   end
 end
