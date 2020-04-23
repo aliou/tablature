@@ -52,6 +52,32 @@ module Tablature
             execute(query)
           end
 
+          def attach_to_list_partition(parent_table, options)
+            values = options.fetch(:values, [])
+            as_default = options.fetch(:default, false)
+
+            raise_unless_default_partition_supported if as_default
+            raise MissingListPartitionValuesError if values.blank? && !as_default
+
+            name = options.fetch(:name) { raise MissingPartitionName }
+
+            if as_default
+              attach_default_partition(parent_table, name)
+            else
+              attach_partition(parent_table, name, values)
+            end
+          end
+
+          def detach_from_list_partition(parent_table, options)
+            name = options.fetch(:name) { raise MissingPartitionName }
+            query = <<~SQL.strip
+              ALTER TABLE #{quote_table_name(parent_table)}
+              DETACH PARTITION #{quote_table_name(name)}
+            SQL
+
+            execute(query)
+          end
+
           private
 
           attr_reader :connection
@@ -67,6 +93,25 @@ module Tablature
           def partition_name(parent_table, values)
             key = values.inspect
             "#{parent_table}_#{Digest::MD5.hexdigest(key)[0..6]}"
+          end
+
+          def attach_default_partition(parent_table, partition_name)
+            query = <<~SQL.strip
+              ALTER TABLE #{quote_table_name(parent_table)}
+              ATTACH PARTITION #{quote_table_name(partition_name)} DEFAULT
+            SQL
+
+            execute(query)
+          end
+
+          def attach_partition(parent_table, partition_name, values)
+            query = <<~SQL.strip
+              ALTER TABLE #{quote_table_name(parent_table)}
+              ATTACH PARTITION #{quote_table_name(partition_name)}
+              FOR VALUES IN (#{quote_collection(values)})
+            SQL
+
+            execute(query)
           end
         end
       end

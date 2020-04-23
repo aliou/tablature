@@ -26,6 +26,18 @@ module Tablature
       Tablature.database.create_list_partition_of(parent_table_name, options)
     end
 
+    def attach_to_list_partition(parent_table_name, options)
+      raise ArgumentError, 'partition_name must be defined' if options[:partition_name]
+
+      Tablature.database.attach_to_list_partition(parent_table_name)
+    end
+
+    def detach_from_list_partition(parent_table_name, options)
+      raise ArgumentError, 'partition_name must be defined' if options[:partition_name]
+
+      Tablature.database.attach_to_list_partition(parent_table_name)
+    end
+
     # Creates a partitioned table using the range partition method.
     #
     # @param name [String, Symbol] The name of the partition.
