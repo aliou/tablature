@@ -35,7 +35,7 @@ module Tablature
     #
     # @see Tablature::Adapters::Postgres#attach_to_list_partition
     def attach_to_list_partition(parent_table_name, options)
-      raise ArgumentError, 'partition_name must be defined' if options[:partition_name]
+      raise ArgumentError, 'name must be defined' if options[:name].blank?
 
       Tablature.database.attach_to_list_partition(parent_table_name, options)
     end
@@ -47,7 +47,7 @@ module Tablature
     #
     # @see Tablature::Adapters::Postgres#detach_from_list_partition
     def detach_from_list_partition(parent_table_name, options)
-      raise ArgumentError, 'partition_name must be defined' if options[:partition_name]
+      raise ArgumentError, 'name must be defined' if options[:name].blank?
       if options[:values].blank? && options[:default].blank?
         raise ArgumentError, 'values or default must be defined'
       end
@@ -90,7 +90,7 @@ module Tablature
     #
     # @see Tablature::Adapters::Postgres#attach_to_range_partition
     def attach_to_range_partition(parent_table_name, options)
-      raise ArgumentError, 'partition_name must be defined' if options[:name]
+      raise ArgumentError, 'name must be defined' if options[:name].blank?
       if (options[:range_start].nil? || options[:range_end].nil?) && options[:default].blank?
         raise ArgumentError, 'range_start and range_end or default must be defined'
       end
@@ -105,7 +105,7 @@ module Tablature
     #
     # @see Tablature::Adapters::Postgres#detach_from_range_partition
     def detach_from_range_partition(parent_table_name, options)
-      raise ArgumentError, 'partition_name must be defined' if options[:name]
+      raise ArgumentError, 'name must be defined' if options[:name].blank?
 
       Tablature.database.detach_from_range_partition(parent_table_name, options)
     end
