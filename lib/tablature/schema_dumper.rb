@@ -63,7 +63,6 @@ module Tablature
 
     # Delegate to the adapter the dumping of indexes.
     def dump_partition_indexes(partitioned_table, stream)
-      return if Gem::Version.new(Rails.version) >= Gem::Version.new('6.0.3')
       return unless Tablature.database.respond_to?(:indexes_on)
 
       indexes = Tablature.database.indexes_on(partitioned_table.name)

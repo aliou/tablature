@@ -191,6 +191,9 @@ module Tablature
       # @param name [String] The name of the partitioned table we want indexes from.
       # @return [Array<ActiveRecord::ConnectionAdapters::IndexDefinition>]
       def indexes_on(partitioned_table)
+        return [] if Gem::Version.new(Rails.version) >= Gem::Version.new('6.0.3')
+        return [] unless connection.supports_indexes_on_partitioned_tables?
+
         Indexes.new(connection).on(partitioned_table)
       end
 

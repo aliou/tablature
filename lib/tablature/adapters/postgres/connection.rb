@@ -38,6 +38,13 @@ module Tablature
           postgresql_version >= 110_000
         end
 
+        # True if the connection supports indexes on partitioned tables.
+        #
+        # @return [Boolean]
+        def supports_indexes_on_partitioned_tables?
+          postgresql_version >= 110_000
+        end
+
         # An integer representing the version of Postgres we're connected to.
         #
         # +postgresql_version+ is public in Rails 5, but protected in earlier
