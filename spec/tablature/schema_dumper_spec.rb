@@ -26,7 +26,7 @@ RSpec.describe Tablature::SchemaDumper, :database do
     expect(output).to include('create_range_partition "events"')
   end
 
-  it 'dumps the indexes for the partition' do
+  it 'dumps the indexes for the partition', :postgres_11 do
     Event.connection.create_range_partition :events, partition_key: :id
     Event.connection.add_index :events, :id, name: 'index_on_id'
     stream = StringIO.new
