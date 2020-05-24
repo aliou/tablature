@@ -4,6 +4,7 @@ require_relative 'postgres/connection'
 require_relative 'postgres/errors'
 require_relative 'postgres/handlers/list'
 require_relative 'postgres/handlers/range'
+require_relative 'postgres/indexes'
 require_relative 'postgres/partitioned_tables'
 
 module Tablature
@@ -183,6 +184,14 @@ module Tablature
       # @return [Array<Tablature::PartitionedTable]
       def partitioned_tables
         PartitionedTables.new(connection).all
+      end
+
+      # Indexes on the Partitioned Table.
+      #
+      # @param name [String] The name of the partitioned table we want indexes from.
+      # @return [Array<ActiveRecord::ConnectionAdapters::IndexDefinition>]
+      def indexes_on(partitioned_table)
+        Indexes.new(connection).on(partitioned_table)
       end
 
       private
