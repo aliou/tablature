@@ -21,6 +21,7 @@ module Tablature
       dumpable_partitioned_tables.each do |partitioned_table|
         dump_partitioned_table(partitioned_table, stream)
         dump_partition_indexes(partitioned_table, stream)
+        dump_foreign_keys(partitioned_table, stream)
       end
     end
 
@@ -75,6 +76,10 @@ module Tablature
 
       stream.puts add_index_statements.sort.join("\n")
       stream.puts
+    end
+
+    def dump_foreign_keys(partitioned_table, stream)
+      foreign_keys(partitioned_table.name, stream)
     end
 
     def dumpable_partitioned_tables
