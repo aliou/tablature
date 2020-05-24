@@ -67,6 +67,8 @@ module Tablature
       return unless Tablature.database.respond_to?(:indexes_on)
 
       indexes = Tablature.database.indexes_on(partitioned_table.name)
+      return if indexes.empty?
+
       add_index_statements = indexes.map do |index|
         table_name = remove_prefix_and_suffix(index.table).inspect
         "  add_index #{([table_name] + index_parts(index)).join(', ')}"
