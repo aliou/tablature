@@ -25,4 +25,15 @@ RSpec.describe Tablature::SchemaDumper, :database do
     output = stream.string
     expect(output).to include('create_range_partition "events"')
   end
+
+  it 'dumps the indexes for the partition' do
+    Event.connection.create_range_partition :events, partition_key: :id
+    Event.connection.add_index :events, :id, name: 'index_on_id'
+    stream = StringIO.new
+
+    ActiveRecord::SchemaDumper.dump(Event.connection, stream)
+
+    output = stream.string
+    expect(output).to match(/index.*name: "index_on_id"/)
+  end
 end

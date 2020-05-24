@@ -20,6 +20,7 @@ module Tablature
 
       dumpable_partitioned_tables.each do |partitioned_table|
         dump_partitioned_table(partitioned_table, stream)
+        dump_partition_indexes(partitioned_table, stream)
       end
     end
 
@@ -58,6 +59,21 @@ module Tablature
       )
 
       main_stream.puts(content)
+    end
+
+    # Delegate to the adapter the dumping of indexes.
+    def dump_partition_indexes(partitioned_table, stream)
+      return if Gem::Version.new(Rails.version) >= Gem::Version.new('6.0.3')
+      return unless Tablature.database.respond_to?(:indexes_on)
+
+      indexes = Tablature.database.indexes_on(partitioned_table.name)
+      add_index_statements = indexes.map do |index|
+        table_name = remove_prefix_and_suffix(index.table).inspect
+        "  add_index #{([table_name] + index_parts(index)).join(', ')}"
+      end
+
+      stream.puts add_index_statements.sort.join("\n")
+      stream.puts
     end
 
     def dumpable_partitioned_tables
