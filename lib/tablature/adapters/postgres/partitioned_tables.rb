@@ -19,8 +19,9 @@ module Tablature
 
         attr_reader :connection
 
+        # rubocop:disable Metrics/MethodLength
         def partitions
-          connection.execute(<<-SQL)
+          result = connection.exec_query(<<-SQL, 'SCHEMA')
             SELECT
               c.oid,
               i.inhrelid,
@@ -39,7 +40,10 @@ module Tablature
               AND n.nspname = ANY (current_schemas(false))
             ORDER BY c.oid
           SQL
+
+          result.to_a
         end
+        # rubocop:enable Metrics/MethodLength
 
         STRATEGY_MAP = {
           'l' => :list,

@@ -1,15 +1,11 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 gemspec
 
 gem 'pry'
 gem 'rubocop'
 
-rails_version = ENV.fetch("RAILS_VERSION", "6.0")
+rails_version = ENV.fetch('RAILS_VERSION', '6.0')
 
-if rails_version == "master"
-  rails_constraint = { github: "rails/rails" }
-else
-  rails_constraint = "~> #{rails_version}.0"
-end
+rails_constraint = rails_version == 'master' ? { github: 'rails/rails' } : "~> #{rails_version}.0"
 
-gem "rails", rails_constraint
+gem 'rails', rails_constraint
