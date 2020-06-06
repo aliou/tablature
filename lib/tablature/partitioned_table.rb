@@ -55,6 +55,21 @@ module Tablature
       partitions.find(&:default_partition?)
     end
 
+    PARTITION_METHOD_MAP = {
+      list: 'create_list_partition',
+      range: 'create_range_partition'
+    }.freeze
+    private_constant :PARTITION_METHOD_MAP
+
+    def to_schema
+      return nil unless PARTITION_METHOD_MAP.key?(partitioning_strategy)
+
+      creation_method = PARTITION_METHOD_MAP[partitioning_strategy]
+      <<-CONTENT
+        #{creation_method} #{name.inspect}, partition_key: #{partition_key.inspect} do |t|
+      CONTENT
+    end
+
     def <=>(other)
       name <=> other.name
     end

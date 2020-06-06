@@ -41,25 +41,17 @@ module Tablature
       stream = StringIO.new
       table(partitioned_table.name, stream)
 
-      # Fetch the creation method for handled partitioning methods, otherwise comment that the
-      # partitioning method is not handled.
-      creation_method = PARTITION_METHOD_MAP.fetch(partitioned_table.partitioning_strategy) do
+      header = partitioned_table.to_schema
+      if header.nil?
         main_stream.puts <<~MESSAGE
-          # Invalid partitioning strategy "#{partitioned_table.partitioning_strategy}" for partitioned table "#{partitioned_table.name}".
+          # Unknown partitioning strategy "#{partitioned_table.partitioning_strategy}" for partitioned table "#{partitioned_table.name}".
+          # Dumping table as a regular table.
         MESSAGE
-
-        return
+        main_stream.puts(stream.tap(&:rewind).read)
+      else
+        content = stream.tap(&:rewind).read.gsub(/create_table.*/, header)
+        main_stream.puts(content)
       end
-
-      # Replace the table creation line with our own line using the partition creation method.
-      content = stream.tap(&:rewind).read.gsub(
-        /create_table.*/,
-        <<~CONTENT.strip
-          #{creation_method} #{quote_table_name(partitioned_table.name)}, partition_key: #{quote(partitioned_table.partition_key)} do |t|
-        CONTENT
-      )
-
-      main_stream.puts(content)
     end
 
     # Delegate to the adapter the dumping of indexes.
