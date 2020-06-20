@@ -3,6 +3,10 @@
 Tablature is a library built on top of ActiveRecord to simplify management of partitioned tables in Rails applications.
 It ships with Postgres support and can easily supports other databases through adapters.
 
+## Status
+
+Tablature is a learning project is not currently used in production. It is probably not production-ready, YMMV.
+
 ## Installation
 
 ##### Requirements
